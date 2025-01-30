@@ -1,0 +1,120 @@
+{
+    "type": "project",
+    "license": "proprietary",
+    "prefer-stable": true,
+    "authors": [
+      {
+        "name": "Mathias Arlaud",
+        "email": "mathias.arlaud@gmail.com"
+      },
+      {
+        "name": "Alan Poulain",
+        "email": "contact@alanpoulain.eu"
+      }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "api-platform/core": "^3.1",
+        "doctrine/annotations": "^2.0",
+        "doctrine/doctrine-bundle": "^2.5",
+        "doctrine/orm": "^2.11",
+        "ecotone/jms-converter": "^1.74",
+        "ecotone/pdo-event-sourcing": "^1.74",
+        "ecotone/symfony-bundle": "^1.74",
+        "nelmio/cors-bundle": "^2.2",
+        "phpdocumentor/reflection-docblock": "^5.3",
+        "phpstan/phpdoc-parser": "^1.2",
+        "symfony/asset": "6.4.*",
+        "symfony/console": "6.4.*",
+        "symfony/dotenv": "6.4.*",
+        "symfony/expression-language": "6.4.*",
+        "symfony/flex": "^2",
+        "symfony/framework-bundle": "6.4.*",
+        "symfony/messenger": "6.4.*",
+        "symfony/monolog-bundle": "^3.0",
+        "symfony/property-access": "6.4.*",
+        "symfony/property-info": "6.4.*",
+        "symfony/proxy-manager-bridge": "6.4.*",
+        "symfony/runtime": "6.4.*",
+        "symfony/security-bundle": "6.4.*",
+        "symfony/serializer": "6.4.*",
+        "symfony/twig-bundle": "6.4.*",
+        "symfony/uid": "6.4.*",
+        "symfony/validator": "6.4.*",
+        "symfony/yaml": "6.4.*",
+        "webmozart/assert": "^1.10"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "symfony/flex": true,
+            "symfony/runtime": true
+        },
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        },
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ]
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": false,
+            "require": "6.4.*",
+            "docker": true,
+            "endpoint": [
+                "https://raw.githubusercontent.com/schranz-php-recipes/symfony-recipes-php/flex/main/index.json",
+                "https://raw.githubusercontent.com/schranz-php-recipes/symfony-recipes-php-contrib/flex/main/index.json",
+                "flex://defaults"
+            ]
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.15",
+        "justinrainbow/json-schema": "^5.2",
+        "phpunit/phpunit": "^9.5",
+        "qossmic/deptrac-shim": "^1.0",
+        "symfony/browser-kit": "6.4.*",
+        "symfony/css-selector": "6.4.*",
+        "symfony/debug-bundle": "6.4.*",
+        "symfony/http-client": "6.4.*",
+        "symfony/phpunit-bridge": "6.4.*",
+        "symfony/stopwatch": "6.4.*",
+        "symfony/web-profiler-bundle": "6.4.*",
+        "vimeo/psalm": "^5.8"
+    }
+}
