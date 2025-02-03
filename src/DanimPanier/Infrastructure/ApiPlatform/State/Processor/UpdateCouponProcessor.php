@@ -6,6 +6,7 @@ namespace App\DanimPanier\Infrastructure\ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
+use ApiPlatform\Validator\ValidatorInterface;
 use App\DanimPanier\Domain\Command\UpdateCouponCommand;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Query\FindCouponQuery;
@@ -30,16 +31,21 @@ final readonly class UpdateCouponProcessor implements ProcessorInterface
         Assert::isInstanceOf($data, CouponResource::class);
         $previous = $context['previous_data'];
         Assert::isInstanceOf($previous, CouponResource::class);
+        Assert::notNull($data->discountValue);
+        Assert::notNull($data->discountPercent);
 
         $id = (string) $previous->id;
 
-        $command = new UpdateCouponCommand(
-            new CouponId($id),
-            null !== $data->discountValue && $previous->discountValue !== $data->discountValue ? new DiscountValue($data->discountValue) : null,
-            null !== $data->discountPercent && $previous->discountPercent !== $data->discountValue ? new DiscountPercent($data->discountPercent) : null,
-        );
+        if ($previous->discountValue !== $data->discountValue || $previous->discountPercent !== $data->discountPercent) {
+            $command = new UpdateCouponCommand(
+                new CouponId($id),
+                $previous->discountValue !== $data->discountValue ? new DiscountValue($data->discountValue) : new DiscountValue($previous->discountValue),
+                $previous->discountPercent !== $data->discountPercent ? new DiscountPercent($data->discountPercent) : new DiscountPercent($previous->discountPercent),
+            );
 
-        $this->commandBus->dispatch($command);
+            $this->commandBus->dispatch($command);
+
+        }
 
         /** @var Coupon $model */
         $model = $this->queryBus->ask(new FindCouponQuery(new CouponId($id)));

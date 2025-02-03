@@ -77,6 +77,7 @@ db-update:
 db-projections:
 	@$(EXEC) bin/console ecotone:es:initialize-projection panierList
 	@$(EXEC) bin/console ecotone:es:initialize-projection panierPriceList
+	@$(EXEC) bin/console ecotone:es:initialize-projection paniersByCoupon
 
 ## Reset database
 db-reset: db-create db-update

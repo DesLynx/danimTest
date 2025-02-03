@@ -8,12 +8,11 @@ use App\DanimPanier\Domain\Command\CreatePanierCommand;
 use App\DanimPanier\Domain\Command\DeletePanierCommand;
 use App\DanimPanier\Domain\Command\UpdatePanierCommand;
 use App\DanimPanier\Domain\Command\UpdatePanierDiscountCommand;
+use App\DanimPanier\Domain\Event\CouponUsageWasDecreased;
 use App\DanimPanier\Domain\Event\PanierDiscountWasUpdated;
 use App\DanimPanier\Domain\Event\PanierWasCreated;
 use App\DanimPanier\Domain\Event\PanierWasDeleted;
 use App\DanimPanier\Domain\Event\PanierWasUpdated;
-use App\DanimPanier\Domain\ValueObject\DiscountPercent;
-use App\DanimPanier\Domain\ValueObject\DiscountValue;
 use App\DanimPanier\Domain\ValueObject\PanierId;
 use App\DanimPanier\Domain\ValueObject\Total;
 use Ecotone\Modelling\Attribute\AggregateIdentifier;
@@ -33,8 +32,7 @@ class Panier
     #[AggregateIdentifier]
     private PanierId $id;
     private Total $total;
-    private DiscountValue $discountValue;
-    private DiscountPercent $discountPercent;
+    private ?Coupon $coupon = null;
     private bool $deleted = false;
 
     #[CommandHandler]
@@ -65,8 +63,7 @@ class Panier
         return [
             new PanierDiscountWasUpdated(
                 id: $command->id,
-                discountValue: $command->discountValue,
-                discountPercent: $command->discountPercent,
+                coupon: $command->coupon,
             ),
         ];
     }
@@ -74,7 +71,16 @@ class Panier
     #[CommandHandler]
     public function delete(DeletePanierCommand $command): array
     {
-        return [new PanierWasDeleted($command->id)];
+        $events = [
+            new PanierWasDeleted($command->id)
+        ];
+
+        if ($this->coupon !== null) {
+            $events[] = new CouponUsageWasDecreased(id: $this->coupon->id());
+            $events[] = new PanierDiscountWasUpdated(id: $command->id, coupon: null);
+        }
+
+        return $events;
     }
 
     #[EventSourcingHandler]
@@ -82,8 +88,6 @@ class Panier
     {
         $this->id = $event->id();
         $this->total = $event->total;
-        $this->discountValue = new DiscountValue(0);
-        $this->discountPercent = new DiscountPercent(0);
     }
 
     #[EventSourcingHandler]
@@ -95,8 +99,7 @@ class Panier
     #[EventSourcingHandler]
     public function applyPanierDiscountWasUpdated(PanierDiscountWasUpdated $event): void
     {
-        $this->discountValue = $event->discountValue ?? $this->discountValue;
-        $this->discountPercent = $event->discountPercent ?? $this->discountPercent;
+        $this->coupon = $event->coupon;
     }
     #[EventSourcingHandler]
     public function applyPanierWasDeleted(PanierWasDeleted $event): void
@@ -114,14 +117,9 @@ class Panier
         return $this->total;
     }
 
-    public function discountValue(): DiscountValue
+    public function coupon(): ?Coupon
     {
-        return $this->discountValue;
-    }
-
-    public function discountPercent(): DiscountPercent
-    {
-        return $this->discountPercent;
+        return $this->coupon;
     }
 
     public function deleted(): bool

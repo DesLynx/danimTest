@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\DanimPanier\Domain\Model;
 
 use App\DanimPanier\Domain\Command\CreateCouponCommand;
+use App\DanimPanier\Domain\Command\DecreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\IncreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\RevokeCouponCommand;
 use App\DanimPanier\Domain\Command\UpdateCouponCommand;
+use App\DanimPanier\Domain\Command\UpdateDiscountCommand;
+use App\DanimPanier\Domain\Event\CouponUsageWasDecreased;
 use App\DanimPanier\Domain\Event\CouponUsageWasIncreased;
 use App\DanimPanier\Domain\Event\CouponWasCreated;
 use App\DanimPanier\Domain\Event\CouponWasRevoked;
@@ -58,7 +61,7 @@ class Coupon
     }
 
     #[CommandHandler]
-    public function update(UpdateCouponCommand $command): array
+    public function update(UpdateDiscountCommand $command): array
     {
         if (!self::isValid($command->discountValue, $command->discountPercent)) {
             throw new MoreThanOneDiscountTypeException();
@@ -83,6 +86,11 @@ class Coupon
     public function use(IncreaseCouponUsageCommand $command): array
     {
         return [new CouponUsageWasIncreased($command->id)];
+    }
+    #[CommandHandler]
+    public function remove(DecreaseCouponUsageCommand $command): array
+    {
+        return [new CouponUsageWasDecreased($command->id)];
     }
 
     #[EventSourcingHandler]
@@ -114,6 +122,12 @@ class Coupon
         $this->usageCount = $this->usageCount->increment();
     }
 
+    #[EventSourcingHandler]
+    public function applyCouponUsageWasDecreased(CouponUsageWasDecreased $event): void
+    {
+        $this->usageCount = $this->usageCount->decrement();
+    }
+
     public function id(): CouponId
     {
         return $this->id;
@@ -143,7 +157,7 @@ class Coupon
         return $this->revoked;
     }
 
-    private static function isValid(DiscountValue $discountValue, DiscountPercent $discountPercent): bool
+    public static function isValid(DiscountValue $discountValue, DiscountPercent $discountPercent): bool
     {
         return !(($discountValue->amount !== 0) && ($discountPercent->percentage !== 0));
     }

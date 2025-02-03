@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DanimPanier\Domain\Repository;
 
 use App\DanimPanier\Domain\Event\PanierEvent;
+use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Model\Panier;
 use App\DanimPanier\Domain\ValueObject\PanierId;
 use App\Shared\Domain\Repository\PaginatorInterface;
@@ -24,4 +25,6 @@ interface PanierRepositoryInterface
      */
     public function paginator(int $page, int $itemsPerPage): PaginatorInterface;
 
+    /** @return iterable<Panier> */
+    public function findByCoupon(Coupon $coupon): iterable;
 }

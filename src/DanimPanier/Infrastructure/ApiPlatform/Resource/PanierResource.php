@@ -74,8 +74,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: DeletePanierProcessor::class,
         ),
     ],
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read:panier']],
+    denormalizationContext: ['groups' => ['write:panier']],
 )]
 final class PanierResource
 {
@@ -85,24 +85,43 @@ final class PanierResource
 
         #[Assert\NotNull(groups: ['create'])]
         #[Assert\PositiveOrZero(groups: ['create', 'Default'])]
-        #[Groups(['read', 'write'])]
+        #[Groups(['read:panier', 'write:panier'])]
         public ?int $total = null,
 
-        #[Groups(['read'])]
-        public ?int $discountValue = null,
+        #[Groups(['read:panier'])]
+        public ?CouponResource $coupon = null,
 
-        #[Groups(['read'])]
-        public ?int $discountPercent = null,
     ) {
+    }
+
+    #[Groups(['read:panier'])]
+    public function getFinalPrice(): int
+    {
+        if (null === $this->coupon) {
+            return $this->total;
+        }
+
+        if (0 !== $this->coupon->discountValue) {
+            return (int) max($this->total - $this->coupon->discountValue, 0);
+        }
+
+        if (0 !== $this->coupon->discountPercent) {
+            return (int) max(ceil($this->total - ($this->total * ($this->coupon->discountPercent/100))), 0);
+        }
+
+        return $this->total;
     }
 
     public static function fromModel(Panier $panier): static
     {
+        $coupon = null;
+        if (null !== $panier->coupon()) {
+            $coupon = CouponResource::fromModel($panier->coupon());
+        }
         return new self(
             Uuid::fromString($panier->id()->value),
             $panier->total()->amount,
-            $panier->discountValue()->amount,
-            $panier->discountPercent()->percentage,
+            $coupon,
         );
     }
 }

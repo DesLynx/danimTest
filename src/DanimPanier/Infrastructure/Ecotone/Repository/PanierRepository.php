@@ -6,10 +6,12 @@ namespace App\DanimPanier\Infrastructure\Ecotone\Repository;
 
 use App\DanimPanier\Domain\Event\PanierEvent;
 use App\DanimPanier\Domain\Exception\MissingPanierException;
+use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Model\Panier;
 use App\DanimPanier\Domain\Repository\PanierRepositoryInterface;
 use App\DanimPanier\Domain\ValueObject\PanierId;
 use App\DanimPanier\Infrastructure\Ecotone\Projection\PanierIdsGateway;
+use App\DanimPanier\Infrastructure\Ecotone\Projection\PaniersByCouponGateway;
 use App\Shared\Domain\Repository\CallbackPaginator;
 use App\Shared\Domain\Repository\PaginatorInterface;
 use Ecotone\EventSourcing\EventStore;
@@ -24,6 +26,7 @@ final readonly class PanierRepository implements PanierRepositoryInterface
         private EventSourcedPanierRepository $eventSourcedRepository,
         private EventStore                   $eventStore,
         private PanierIdsGateway             $panierIdsGateway,
+        private PaniersByCouponGateway       $paniersByCouponGateway,
     ) {
     }
 
@@ -32,7 +35,7 @@ final readonly class PanierRepository implements PanierRepositoryInterface
         if (!$eventSourcedPanier = $this->eventSourcedRepository->findBy($id)) {
             return null;
         }
-
+        dump($eventSourcedPanier);
         if ($eventSourcedPanier->deleted()) {
             return null;
         }
@@ -76,4 +79,16 @@ final readonly class PanierRepository implements PanierRepositoryInterface
             fn (PanierId $panierId) => $this->ofId($panierId) ?? throw new MissingPanierException($panierId),
         );
     }
+
+    public function findByCoupon(Coupon $coupon): iterable
+    {
+        $byCouponPanierIds = $this->paniersByCouponGateway->getByCouponPanierIds();
+        dump($byCouponPanierIds);
+        foreach ($byCouponPanierIds[$coupon->id()->value] ?? [] as $panierId) {
+            if ($panier = $this->ofId(new PanierId($panierId))) {
+                yield $panier;
+            }
+        }
+    }
+
 }

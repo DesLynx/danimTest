@@ -21,4 +21,10 @@ final readonly class UsageCount
     {
         return new self($this->amount + 1);
     }
+
+    public function decrement(): self
+    {
+        Assert::greaterThanEq($this->amount, 1);
+        return new self($this->amount - 1);
+    }
 }

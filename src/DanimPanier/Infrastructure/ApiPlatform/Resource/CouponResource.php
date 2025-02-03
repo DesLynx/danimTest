@@ -37,6 +37,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CouponEventsProvider::class,
         ),
 
+        // TODO add a command to revoke that change the state of the coupon and update the panier
+
         // basic crud
         new GetCollection(
             provider: CouponCollectionProvider::class,
@@ -45,7 +47,6 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CouponItemProvider::class,
         ),
         new Post(
-            validationContext: ['groups' => ['create']],
             processor: CreateCouponProcessor::class,
         ),
         new Put(
@@ -57,13 +58,14 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CouponItemProvider::class,
             processor: UpdateCouponProcessor::class,
         ),
+        // TODO: make this a delete not a revoke
         new Delete(
             provider: CouponItemProvider::class,
             processor: RevokeCouponProcessor::class,
         ),
     ],
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']],
+    normalizationContext: ['groups' => ['read:coupon']],
+    denormalizationContext: ['groups' => ['write:coupon']],
 )]
 final class CouponResource
 {
@@ -71,20 +73,20 @@ final class CouponResource
         #[ApiProperty(identifier: true, readable: false, writable: false)]
         public ?AbstractUid $id = null,
 
-        #[Assert\NotNull(groups: ['create'])]
-        #[Assert\PositiveOrZero(groups: ['create', 'Default'])]
-        #[Groups(['read', 'write'])]
+        #[Assert\NotNull]
+        #[Assert\PositiveOrZero]
+        #[Groups(['read:coupon', 'write:coupon', 'read:panier'])]
         public ?int $discountValue = null,
 
-        #[Assert\NotNull(groups: ['create'])]
-        #[Assert\Range(min: 0, max: 100, groups: ['create', 'Default'])]
-        #[Groups(['read', 'write'])]
+        #[Assert\NotNull]
+        #[Assert\Range(min: 0, max: 100)]
+        #[Groups(['read:coupon', 'write:coupon', 'read:panier'])]
         public ?int $discountPercent = null,
 
-        #[Groups(['read'])]
+        #[Groups(['read:coupon'])]
         public ?string $createdAt = null,
 
-        #[Groups(['read'])]
+        #[Groups(['read:coupon'])]
         public ?int $usageCount = null,
     ) {
     }

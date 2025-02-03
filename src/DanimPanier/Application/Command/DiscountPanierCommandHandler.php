@@ -15,6 +15,7 @@ use App\DanimPanier\Domain\Repository\PanierRepositoryInterface;
 use App\Shared\Application\Command\CommandBusInterface;
 use App\Shared\Application\Command\CommandHandlerInterface;
 use Ecotone\Modelling\Attribute\CommandHandler;
+use Webmozart\Assert\Assert;
 
 final readonly class DiscountPanierCommandHandler implements CommandHandlerInterface
 {
@@ -29,7 +30,9 @@ final readonly class DiscountPanierCommandHandler implements CommandHandlerInter
     public function __invoke(DiscountPanierCommand $command): void
     {
         $panier = $this->panierRepository->ofId($command->id);
+        Assert::notNull($panier);
         $coupon = $this->couponRepository->ofId($command->couponId);
+        Assert::notNull($coupon);
 
         // checks
         if ($coupon->usageCount()->amount >= 10) {
@@ -45,8 +48,7 @@ final readonly class DiscountPanierCommandHandler implements CommandHandlerInter
         $this->commandBus->dispatch(
             new UpdatePanierDiscountCommand(
                 id: $command->id,
-                discountValue: $coupon->discountValue(),
-                discountPercent: $coupon->discountPercent(),
+                coupon: $coupon,
             )
         );
 
