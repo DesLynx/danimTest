@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\DanimPanier\Domain\Command\CreateCouponCommand;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Query\FindCouponQuery;
+use App\DanimPanier\Domain\ValueObject\Code;
 use App\DanimPanier\Domain\ValueObject\CouponId;
 use App\DanimPanier\Domain\ValueObject\DiscountPercent;
 use App\DanimPanier\Domain\ValueObject\DiscountValue;
@@ -29,12 +30,14 @@ final readonly class CreateCouponProcessor implements ProcessorInterface
     {
         Assert::isInstanceOf($data, CouponResource::class);
 
+        Assert::notNull($data->code);
         Assert::notNull($data->discountValue);
         Assert::greaterThanEq($data->discountValue, 0);
         Assert::notNull($data->discountPercent);
         Assert::range($data->discountPercent, 0, 100);
 
         $command = new CreateCouponCommand(
+            new Code($data->code),
             new DiscountValue($data->discountValue),
             new DiscountPercent($data->discountPercent),
         );

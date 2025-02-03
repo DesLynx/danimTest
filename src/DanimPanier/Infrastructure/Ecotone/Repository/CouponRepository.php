@@ -8,8 +8,10 @@ use App\DanimPanier\Domain\Event\CouponEvent;
 use App\DanimPanier\Domain\Exception\MissingCouponException;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Repository\CouponRepositoryInterface;
+use App\DanimPanier\Domain\ValueObject\Code;
 use App\DanimPanier\Domain\ValueObject\CouponId;
 use App\DanimPanier\Infrastructure\Ecotone\Projection\CouponIdsGateway;
+use App\DanimPanier\Infrastructure\Ecotone\Projection\CouponsByCodeGateway;
 use App\Shared\Domain\Repository\CallbackPaginator;
 use App\Shared\Domain\Repository\PaginatorInterface;
 use Ecotone\EventSourcing\EventStore;
@@ -24,6 +26,7 @@ final readonly class CouponRepository implements CouponRepositoryInterface
         private EventSourcedCouponRepository $eventSourcedRepository,
         private EventStore $eventStore,
         private CouponIdsGateway $couponIdsGateway,
+        private CouponsByCodeGateway $couponsByCodeGateway,
     ) {
     }
 
@@ -76,4 +79,17 @@ final readonly class CouponRepository implements CouponRepositoryInterface
             fn (CouponId $couponId) => $this->ofId($couponId) ?? throw new MissingCouponException($couponId),
         );
     }
+
+
+    public function findByCode(Code $code): iterable
+    {
+        $byCodeCouponIds = $this->couponsByCodeGateway->getByCodeCouponIds();
+
+        foreach ($byCodeCouponIds[$code->value] ?? [] as $couponId) {
+            if ($coupon = $this->ofId(new CouponId($couponId))) {
+                yield $coupon;
+            }
+        }
+    }
+
 }

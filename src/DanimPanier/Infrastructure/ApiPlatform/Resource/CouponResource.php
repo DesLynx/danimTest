@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\DanimPanier\Domain\Event\CouponEvent;
 use App\DanimPanier\Domain\Model\Coupon;
+use App\DanimPanier\Infrastructure\ApiPlatform\OpenApi\CodeFilter;
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Processor\CreateCouponProcessor;
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Processor\RevokeCouponProcessor;
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Processor\UpdateCouponProcessor;
@@ -37,10 +38,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             provider: CouponEventsProvider::class,
         ),
 
-        // TODO add a command to revoke that change the state of the coupon and update the panier
+        // TODO add a command to revoke the coupon, that change the state of the coupon and update the panier
 
         // basic crud
         new GetCollection(
+            filters: [CodeFilter::class],
             provider: CouponCollectionProvider::class,
         ),
         new Get(
@@ -74,6 +76,10 @@ final class CouponResource
         public ?AbstractUid $id = null,
 
         #[Assert\NotNull]
+        #[Groups(['read:coupon', 'write:coupon', 'read:panier'])]
+        public ?string $code = null,
+
+        #[Assert\NotNull]
         #[Assert\PositiveOrZero]
         #[Groups(['read:coupon', 'write:coupon', 'read:panier'])]
         public ?int $discountValue = null,
@@ -95,6 +101,7 @@ final class CouponResource
     {
         return new self(
             Uuid::fromString($coupon->id()->value),
+            $coupon->code()->value,
             $coupon->discountValue()->amount,
             $coupon->discountPercent()->percentage,
             $coupon->createdAt()->value,

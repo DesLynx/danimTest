@@ -18,6 +18,10 @@ final readonly class FindCouponsQueryHandler implements QueryHandlerInterface
     #[QueryHandler]
     public function __invoke(FindCouponsQuery $query): iterable
     {
+        if (null !== $query->code) {
+            return $this->couponRepository->findByCode($query->code);
+        }
+
         if (null !== $query->page && null !== $query->itemsPerPage) {
             return $this->couponRepository->paginator($query->page, $query->itemsPerPage);
         }

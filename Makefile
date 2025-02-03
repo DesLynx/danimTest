@@ -75,8 +75,10 @@ db-update:
 	@$(EXEC) bin/console doctrine:schema:update --force -nq
 
 db-projections:
+	@$(EXEC) bin/console ecotone:es:initialize-projection couponList
+	@$(EXEC) bin/console ecotone:es:initialize-projection couponsByCode
 	@$(EXEC) bin/console ecotone:es:initialize-projection panierList
-	@$(EXEC) bin/console ecotone:es:initialize-projection panierPriceList
+	@$(EXEC) bin/console ecotone:es:initialize-projection panierTotalList
 	@$(EXEC) bin/console ecotone:es:initialize-projection paniersByCoupon
 
 ## Reset database

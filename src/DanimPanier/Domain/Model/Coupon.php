@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\DanimPanier\Domain\Model;
 
 use App\DanimPanier\Domain\Command\CreateCouponCommand;
+use App\DanimPanier\Domain\Command\CreateDiscountCommand;
 use App\DanimPanier\Domain\Command\DecreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\IncreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\RevokeCouponCommand;
@@ -15,6 +16,7 @@ use App\DanimPanier\Domain\Event\CouponWasCreated;
 use App\DanimPanier\Domain\Event\CouponWasRevoked;
 use App\DanimPanier\Domain\Event\CouponWasUpdated;
 use App\DanimPanier\Domain\Exception\MoreThanOneDiscountTypeException;
+use App\DanimPanier\Domain\ValueObject\Code;
 use App\DanimPanier\Domain\ValueObject\CouponId;
 use App\DanimPanier\Domain\ValueObject\DateTime;
 use App\DanimPanier\Domain\ValueObject\DiscountPercent;
@@ -36,6 +38,7 @@ class Coupon
 
     #[AggregateIdentifier]
     private CouponId $id;
+    private Code $code;
     private DiscountValue $discountValue;
     private DiscountPercent $discountPercent;
     private UsageCount $usageCount;
@@ -43,7 +46,7 @@ class Coupon
     private bool $revoked = false;
 
     #[CommandHandler]
-    public static function create(CreateCouponCommand $command): array
+    public static function create(CreateDiscountCommand $command): array
     {
         if (!self::isValid($command->discountValue, $command->discountPercent)) {
             throw new MoreThanOneDiscountTypeException();
@@ -52,6 +55,7 @@ class Coupon
         return [
             new CouponWasCreated(
                 id: new CouponId(),
+                code: $command->code,
                 discountValue: $command->discountValue,
                 discountPercent: $command->discountPercent,
                 createdAt: new DateTime((new \DateTimeImmutable())->format(DATE_ATOM)),
@@ -97,6 +101,7 @@ class Coupon
     public function applyCouponWasCreated(CouponWasCreated $event): void
     {
         $this->id = $event->id();
+        $this->code = $event->code;
         $this->discountValue = $event->discountValue;
         $this->discountPercent = $event->discountPercent;
         $this->usageCount = new UsageCount(0);
@@ -106,6 +111,7 @@ class Coupon
     #[EventSourcingHandler]
     public function applyCouponWasUpdated(CouponWasUpdated $event): void
     {
+        $this->code = $event->code ?? $this->code;
         $this->discountValue = $event->discountValue ?? $this->discountValue;
         $this->discountPercent = $event->discountPercent ?? $this->discountPercent;
     }
@@ -133,6 +139,10 @@ class Coupon
         return $this->id;
     }
 
+    public function code(): Code
+    {
+        return $this->code;
+    }
     public function discountValue(): DiscountValue
     {
         return $this->discountValue;

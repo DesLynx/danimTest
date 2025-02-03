@@ -9,6 +9,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\DanimPanier\Domain\Command\UpdateCouponCommand;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Query\FindCouponQuery;
+use App\DanimPanier\Domain\ValueObject\Code;
 use App\DanimPanier\Domain\ValueObject\CouponId;
 use App\DanimPanier\Domain\ValueObject\DiscountPercent;
 use App\DanimPanier\Domain\ValueObject\DiscountValue;
@@ -38,6 +39,7 @@ final readonly class UpdateCouponProcessor implements ProcessorInterface
         if ($previous->discountValue !== $data->discountValue || $previous->discountPercent !== $data->discountPercent) {
             $command = new UpdateCouponCommand(
                 new CouponId($id),
+                null !== $data->code && $previous->code !== $data->code ? new Code($data->code) : new Code($previous->code),
                 $previous->discountValue !== $data->discountValue ? new DiscountValue($data->discountValue) : new DiscountValue($previous->discountValue),
                 $previous->discountPercent !== $data->discountPercent ? new DiscountPercent($data->discountPercent) : new DiscountPercent($previous->discountPercent),
             );

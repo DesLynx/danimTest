@@ -8,6 +8,7 @@ use App\DanimPanier\Domain\Command\UpdateCouponCommand;
 use App\DanimPanier\Domain\Command\UpdateDiscountCommand;
 use App\DanimPanier\Domain\Command\UpdatePanierDiscountCommand;
 use App\DanimPanier\Domain\Exception\MoreThanOneDiscountTypeException;
+use App\DanimPanier\Domain\Exception\NotUniqueCouponCodeException;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Repository\CouponRepositoryInterface;
 use App\DanimPanier\Domain\Repository\PanierRepositoryInterface;
@@ -28,15 +29,22 @@ final readonly class UpdateCouponCommandHandler implements CommandHandlerInterfa
     #[CommandHandler]
     public function __invoke(UpdateCouponCommand $command): void
     {
+        $coupon = $this->couponRepository->ofId($command->id);
+        Assert::notNull($coupon);
+
+        foreach($this->couponRepository->findByCode($command->code) as $search) {
+            if (!$search->id()->equals($coupon->id())) {
+                throw new NotUniqueCouponCodeException();
+            }
+        }
         if (!Coupon::isValid($command->discountValue, $command->discountPercent)) {
             throw new MoreThanOneDiscountTypeException();
         }
 
-        $coupon = $this->couponRepository->ofId($command->id);
-        Assert::notNull($coupon);
         $this->commandBus->dispatch(
             new UpdateDiscountCommand(
                 id: $coupon->id(),
+                code: $command->code,
                 discountValue: $command->discountValue,
                 discountPercent: $command->discountPercent,
             )
