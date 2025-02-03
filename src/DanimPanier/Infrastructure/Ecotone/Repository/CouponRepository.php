@@ -22,8 +22,8 @@ final readonly class CouponRepository implements CouponRepositoryInterface
 {
     public function __construct(
         private EventSourcedCouponRepository $eventSourcedRepository,
-        private EventStore                   $eventStore,
-        private CouponIdsGateway             $couponIdsGateway,
+        private EventStore $eventStore,
+        private CouponIdsGateway $couponIdsGateway,
     ) {
     }
 

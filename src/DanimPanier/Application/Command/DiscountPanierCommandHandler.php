@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\DanimPanier\Application\Command;
 
-use App\DanimPanier\Domain\Command\IncreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\DiscountPanierCommand;
+use App\DanimPanier\Domain\Command\IncreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\UpdatePanierDiscountCommand;
 use App\DanimPanier\Domain\Exception\CouponDeniedCauseAmountException;
 use App\DanimPanier\Domain\Exception\CouponDeniedCauseExpiredException;

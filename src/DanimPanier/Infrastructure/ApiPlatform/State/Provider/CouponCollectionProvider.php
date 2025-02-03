@@ -36,7 +36,7 @@ final readonly class CouponCollectionProvider implements ProviderInterface
         }
 
         /** @var iterable<Coupon>|PaginatorInterface<Coupon> $coupons */
-        $coupons = $this->queryBus->ask(new FindCouponsQuery( $offset, $limit));
+        $coupons = $this->queryBus->ask(new FindCouponsQuery($offset, $limit));
 
         $resources = [];
         foreach ($coupons as $coupon) {

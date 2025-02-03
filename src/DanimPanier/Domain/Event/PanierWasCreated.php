@@ -10,8 +10,8 @@ use App\DanimPanier\Domain\ValueObject\Total;
 final readonly class PanierWasCreated implements PanierEvent
 {
     public function __construct(
-        private PanierId       $id,
-        public Total           $total,
+        private PanierId $id,
+        public Total $total,
     ) {
     }
 

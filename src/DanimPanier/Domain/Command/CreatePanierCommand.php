@@ -10,7 +10,7 @@ use App\Shared\Domain\Command\CommandInterface;
 final readonly class CreatePanierCommand implements CommandInterface
 {
     public function __construct(
-        public Total           $total,
+        public Total $total,
     ) {
     }
 }

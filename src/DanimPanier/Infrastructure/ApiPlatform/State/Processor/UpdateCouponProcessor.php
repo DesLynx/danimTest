@@ -6,7 +6,6 @@ namespace App\DanimPanier\Infrastructure\ApiPlatform\State\Processor;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Validator\ValidatorInterface;
 use App\DanimPanier\Domain\Command\UpdateCouponCommand;
 use App\DanimPanier\Domain\Model\Coupon;
 use App\DanimPanier\Domain\Query\FindCouponQuery;
@@ -44,7 +43,6 @@ final readonly class UpdateCouponProcessor implements ProcessorInterface
             );
 
             $this->commandBus->dispatch($command);
-
         }
 
         /** @var Coupon $model */

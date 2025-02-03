@@ -11,7 +11,7 @@ final readonly class PanierWasDiscounted implements PanierEvent
 {
     public function __construct(
         private PanierId $id,
-        public CouponId  $couponId,
+        public CouponId $couponId,
     ) {
     }
 

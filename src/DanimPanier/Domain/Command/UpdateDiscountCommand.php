@@ -12,8 +12,8 @@ use App\Shared\Domain\Command\CommandInterface;
 final readonly class UpdateDiscountCommand implements CommandInterface
 {
     public function __construct(
-        public CouponId        $id,
-        public ?DiscountValue   $discountValue = null,
+        public CouponId $id,
+        public ?DiscountValue $discountValue = null,
         public ?DiscountPercent $discountPercent = null,
     ) {
     }

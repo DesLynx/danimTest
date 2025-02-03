@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DanimPanier\Domain\Command;
 
 use App\DanimPanier\Domain\ValueObject\CouponId;

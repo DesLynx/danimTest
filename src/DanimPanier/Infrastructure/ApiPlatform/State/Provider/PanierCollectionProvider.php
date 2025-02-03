@@ -36,7 +36,7 @@ final readonly class PanierCollectionProvider implements ProviderInterface
         }
 
         /** @var iterable<Panier>|PaginatorInterface<Panier> $paniers */
-        $paniers = $this->queryBus->ask(new FindPaniersQuery( $offset, $limit));
+        $paniers = $this->queryBus->ask(new FindPaniersQuery($offset, $limit));
 
         $resources = [];
         foreach ($paniers as $panier) {

@@ -8,7 +8,6 @@ use App\DanimPanier\Domain\Command\CreateCouponCommand;
 use App\DanimPanier\Domain\Command\DecreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\IncreaseCouponUsageCommand;
 use App\DanimPanier\Domain\Command\RevokeCouponCommand;
-use App\DanimPanier\Domain\Command\UpdateCouponCommand;
 use App\DanimPanier\Domain\Command\UpdateDiscountCommand;
 use App\DanimPanier\Domain\Event\CouponUsageWasDecreased;
 use App\DanimPanier\Domain\Event\CouponUsageWasIncreased;
@@ -87,6 +86,7 @@ class Coupon
     {
         return [new CouponUsageWasIncreased($command->id)];
     }
+
     #[CommandHandler]
     public function remove(DecreaseCouponUsageCommand $command): array
     {
@@ -147,6 +147,7 @@ class Coupon
     {
         return $this->usageCount;
     }
+
     public function createdAt(): DateTime
     {
         return $this->createdAt;
@@ -159,6 +160,6 @@ class Coupon
 
     public static function isValid(DiscountValue $discountValue, DiscountPercent $discountPercent): bool
     {
-        return !(($discountValue->amount !== 0) && ($discountPercent->percentage !== 0));
+        return !((0 !== $discountValue->amount) && (0 !== $discountPercent->percentage));
     }
 }

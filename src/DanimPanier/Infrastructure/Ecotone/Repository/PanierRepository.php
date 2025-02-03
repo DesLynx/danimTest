@@ -24,9 +24,9 @@ final readonly class PanierRepository implements PanierRepositoryInterface
 {
     public function __construct(
         private EventSourcedPanierRepository $eventSourcedRepository,
-        private EventStore                   $eventStore,
-        private PanierIdsGateway             $panierIdsGateway,
-        private PaniersByCouponGateway       $paniersByCouponGateway,
+        private EventStore $eventStore,
+        private PanierIdsGateway $panierIdsGateway,
+        private PaniersByCouponGateway $paniersByCouponGateway,
     ) {
     }
 
@@ -90,5 +90,4 @@ final readonly class PanierRepository implements PanierRepositoryInterface
             }
         }
     }
-
 }

@@ -11,8 +11,8 @@ use App\Shared\Domain\Command\CommandInterface;
 final readonly class UpdatePanierCommand implements CommandInterface
 {
     public function __construct(
-        public PanierId         $id,
-        public ?Total           $total = null,
+        public PanierId $id,
+        public ?Total $total = null,
     ) {
     }
 }

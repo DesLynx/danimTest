@@ -72,10 +72,10 @@ class Panier
     public function delete(DeletePanierCommand $command): array
     {
         $events = [
-            new PanierWasDeleted($command->id)
+            new PanierWasDeleted($command->id),
         ];
 
-        if ($this->coupon !== null) {
+        if (null !== $this->coupon) {
             $events[] = new CouponUsageWasDecreased(id: $this->coupon->id());
             $events[] = new PanierDiscountWasUpdated(id: $command->id, coupon: null);
         }
@@ -101,6 +101,7 @@ class Panier
     {
         $this->coupon = $event->coupon;
     }
+
     #[EventSourcingHandler]
     public function applyPanierWasDeleted(PanierWasDeleted $event): void
     {

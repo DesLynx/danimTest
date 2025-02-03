@@ -15,8 +15,8 @@ use App\DanimPanier\Infrastructure\ApiPlatform\State\Provider\CouponCollectionPr
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Provider\CouponItemProvider;
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Provider\PanierCollectionProvider;
 use App\DanimPanier\Infrastructure\ApiPlatform\State\Provider\PanierItemProvider;
-use App\DanimPanier\Infrastructure\Ecotone\Repository\PanierRepository;
 use App\DanimPanier\Infrastructure\Ecotone\Repository\CouponRepository;
+use App\DanimPanier\Infrastructure\Ecotone\Repository\PanierRepository;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 
 return static function (ContainerConfigurator $containerConfigurator): void {
@@ -26,8 +26,7 @@ return static function (ContainerConfigurator $containerConfigurator): void {
         ->autowire()
         ->autoconfigure();
 
-    $services->load('App\\DanimPanier\\', __DIR__ . '/../../src/DanimPanier');
-
+    $services->load('App\\DanimPanier\\', __DIR__.'/../../src/DanimPanier');
 
     // providers
     $services->set(PanierItemProvider::class)
@@ -43,7 +42,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(CouponCollectionProvider::class)
         ->autoconfigure(false)
         ->tag('api_platform.state_provider', ['priority' => 0]);
-
 
     // processors
     $services->set(DiscountPanierProcessor::class)
@@ -68,7 +66,6 @@ return static function (ContainerConfigurator $containerConfigurator): void {
     $services->set(RevokeCouponProcessor::class)
         ->autoconfigure(false)
         ->tag('api_platform.state_processor', ['priority' => 0]);
-
 
     // repositories
     $services->set(PanierRepositoryInterface::class)

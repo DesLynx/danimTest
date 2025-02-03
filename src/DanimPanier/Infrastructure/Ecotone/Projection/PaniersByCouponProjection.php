@@ -19,7 +19,6 @@ final class PaniersByCouponProjection
 {
     public const NAME = 'paniersByCoupon';
 
-
     /**
      * @param array<string, list<string>> $paniersByCouponState
      *

@@ -23,5 +23,4 @@ interface CouponRepositoryInterface
      * @return PaginatorInterface<Coupon>
      */
     public function paginator(int $page, int $itemsPerPage): PaginatorInterface;
-
 }

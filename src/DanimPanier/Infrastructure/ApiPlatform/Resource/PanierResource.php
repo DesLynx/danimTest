@@ -90,7 +90,6 @@ final class PanierResource
 
         #[Groups(['read:panier'])]
         public ?CouponResource $coupon = null,
-
     ) {
     }
 
@@ -106,7 +105,7 @@ final class PanierResource
         }
 
         if (0 !== $this->coupon->discountPercent) {
-            return (int) max(ceil($this->total - ($this->total * ($this->coupon->discountPercent/100))), 0);
+            return (int) max(ceil($this->total - ($this->total * ($this->coupon->discountPercent / 100))), 0);
         }
 
         return $this->total;
@@ -118,6 +117,7 @@ final class PanierResource
         if (null !== $panier->coupon()) {
             $coupon = CouponResource::fromModel($panier->coupon());
         }
+
         return new self(
             Uuid::fromString($panier->id()->value),
             $panier->total()->amount,
